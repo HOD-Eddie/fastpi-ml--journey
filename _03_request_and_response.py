@@ -3,9 +3,13 @@
 # a request body. 
 # When the server sends info back to the user, it is passed as a response body.
 # a client can pass data of varioius formats such as text, images etx.
-from schemas import Product, ResponseBody, UpdateSupplier, UpdateProduct, Supplier
 from fastapi import FastAPI, HTTPException, status
 
+from _03_schemas import Product, ResponseBody, Supplier, UpdateProduct
+
+# This in-memory store acts like a lightweight database while we practice API
+# contracts. It makes request/response flows easy to reason about without adding
+# persistence or a database layer yet.
 FAKE_PRODUCTS_DB: list[Product] = [
     Product(
         pid=1,
@@ -45,17 +49,21 @@ def get_by_id(pid: int):
 
 @inst.post("/products/", response_model=ResponseBody)
 def create_product(prod: Product):
+    # Duplicate prevention is a classic API rule: we reject conflicts early instead
+    # of creating two records that share the same primary key.
     for product in FAKE_PRODUCTS_DB:
         if product.pid == prod.pid:
-            # Fixed the non-existent status attribute:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Product already exists")
-            
+
     FAKE_PRODUCTS_DB.append(prod)
     return prod
 
 
 @inst.put("/products/{pid}", response_model=UpdateProduct)
 def update_product_details(pid: int, uprod: UpdateProduct):
+    # The update contract is partial: only fields that are supplied in the payload
+    # should overwrite the stored record. This keeps the endpoint flexible without
+    # requiring the client to resend the entire object.
     for product in FAKE_PRODUCTS_DB:
         if product.pid == pid:
             if uprod.name is not None:

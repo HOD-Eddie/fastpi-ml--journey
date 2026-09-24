@@ -2,12 +2,14 @@ from typing import Annotated
 from pydantic import ConfigDict, BaseModel, EmailStr, Field
 
 class Supplier(BaseModel):
+    # Nested schemas prevent the supplier object from becoming an unstructured dict.
     sid: int = Field(strict=True, gt=0)
     sname: str = Field(..., min_length=5, max_length=35)
     email: EmailStr | None = None
 
 
 class Product(BaseModel):
+    # Each field enforces a business rule before the object is accepted by the API.
     pid: int = Field(..., strict=True, gt=0)
     name: str = Field(..., min_length=3, max_length=25)
     description: str | None = None

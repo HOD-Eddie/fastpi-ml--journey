@@ -42,6 +42,16 @@ inside its structured `ValidationError`.
 useful at an API boundary because a misspelled or unexpected setting should be
 noticed instead of silently ignored.
 
+## Coding Journey Entry
+
+This week I moved from passive theory into practical API design by building FastAPI endpoints that validate input, shape response bodies, and handle uploaded files in realistic ways. The biggest concept I internalized was that a model is not just a data container; it is a contract. Pydantic lets me define that contract with Python types and validate it at the edge of the application before the rest of the code reads the payload.
+
+I also reinforced the difference between query parameters and path parameters. A query string is used to filter or refine a request, while a path parameter identifies a specific resource such as `/products/42`. That mental model made the route ordering and error handling much clearer, especially when I needed to avoid ambiguous matches.
+
+The file-upload work introduced another important principle: validate metadata first, process data in chunks when the file may be large, and keep disk I/O separate from business logic. That pattern is useful not only for uploading photos but also for any feature that may receive large or untrusted content.
+
+In short, I now understand how FastAPI, Pydantic, and request/response schemas fit together: the framework routes the traffic, the model enforces the contract, and the endpoint logic does the actual domain work.
+
 ## My experiments
 
 `pydantic-test.py` is the focused challenge. It demonstrates one successful

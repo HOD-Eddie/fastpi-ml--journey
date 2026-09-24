@@ -10,25 +10,31 @@ ALLOWED_TYPES = {"image/jpeg", "image/png", "audio/mp3", "image/jpg"}
 
 @app.post("/transcribe/")
 async def transcribe_audio(file: UploadFile = File(...)):
-    # 1. Validate content type metadata
+    # The server should validate the file at the API boundary before it spends time
+    # processing a payload that violates the expected contract.
     if file.content_type not in ALLOWED_TYPES:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid file format.Only jpg, png, mp3, and jpeg files are allowed."
         )
-        
-    # 2. Validate maximum size using metadata
+
+    # File metadata is a quick way to reject unusually large uploads before we start
+    # reading content from the stream.
     if file.size > MAX_SIZE:
         raise HTTPException(
             status_code=status.HTTP_413_CONTENT_TOO_LARGE,
             detail="File is too massive!"
         )
-        
-    # 3. Stream in chunks to verify the payload
+
+    # Streaming in fixed-size chunks lets us verify the file's integrity without
+    # buffering the entire payload in memory.
     total_bytes = 0
     try:
         while chunk := await file.read(CHUNK_SIZE):
             total_bytes += len(chunk)
+
+        # reset file cursor position to beginning
+        await file.seek(0)
             
     except Exception:
         raise HTTPException(
@@ -41,3 +47,5 @@ async def transcribe_audio(file: UploadFile = File(...)):
         "verified_size": total_bytes,
         "transcript": f"Mock transcription completed for {file.filename}"
     }
+
+

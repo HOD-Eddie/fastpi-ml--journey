@@ -19,6 +19,8 @@ class UserSignupModel(BaseModel):
 
     model_config = ConfigDict(validate_by_name=True, extra="forbid")
 
+    # Strict typing and nested models help us model real-world payloads without
+    # letting invalid data silently drift deeper into the application.
     user_id: Annotated[int, Field(strict=True)]
     username: Annotated[str, Field(min_length=3, max_length=20)]
     email: EmailStr

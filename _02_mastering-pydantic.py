@@ -27,14 +27,17 @@ class User(BaseModel):
     # Literal restricts a value to a known set of choices.
     gender: Literal["male", "female"] | None = None
 
-    # A custom validator expresses a rule that Field() cannot express by itself.
+    # Custom rules live here when `Field()` cannot describe the business invariant.
+    # This validator keeps names normalized and rejects values that are structurally invalid.
     @field_validator("first_name")
     @classmethod
     def validate_firstname(cls, value: str) -> str:
         if not value.replace("-", "").isalnum():
             raise ValueError("firstname must be alphanumeric")
         return value.lower()
-    
+
+# Building a list of model instances demonstrates that Pydantic validates data
+# before the objects are used anywhere else in the app.
 users: list[User] = [
     User(first_name="Eddie", email="eddie@gmail.com", age=34, password="learning"),
     User(first_name="Grace", email="grace@gmail.com", age=35, password="learning"),
