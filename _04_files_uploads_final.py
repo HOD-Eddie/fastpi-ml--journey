@@ -68,6 +68,7 @@ async def process_image_endpoint(
 # ------------------------------------------------------------------------------
 # Why? Heavy model compute blocks the ASGI event loop and risks memory saturation (OOM).
 # Solution: Save large payloads directly to disk in chunks, and pass a string file path
+\
 # to a BackgroundTasks worker threadpool, responding to the client immediately.
 # ------------------------------------------------------------------------------
 

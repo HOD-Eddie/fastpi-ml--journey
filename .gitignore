@@ -1,0 +1,23 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+# Ignore local model binaries to keep Git lightweight
+*.pkl
+*.onnx
+*.pt
+*.h5
+data/
+
+# trained models, test chaches, and configuration files.
+app/models/*.joblib
+*.joblib
+*.pyc
+.idea/
+.DS_Store
+.pytest_cache/
+.vscode/
+.venv/
+ENV/
+env/
+__pycache__/
